@@ -1,17 +1,18 @@
 package org.example.models;
 
 public class Event {
-    private Long id;
+    private Long idEvent;
     private String titre;
     private String description;
-    private String date;
-    private String n_sale;   // salle / location
+    private String dateEvent;
+    private String nSale;
+    private String image;
 
     public Event() {}
 
     // Getters and Setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Long getIdEvent() { return idEvent; }
+    public void setIdEvent(Long idEvent) { this.idEvent = idEvent; }
 
     public String getTitre() { return titre; }
     public void setTitre(String titre) { this.titre = titre; }
@@ -19,9 +20,12 @@ public class Event {
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
 
-    public String getDate() { return date; }
-    public void setDate(String date) { this.date = date; }
+    public String getDateEvent() { return dateEvent; }
+    public void setDateEvent(String dateEvent) { this.dateEvent = dateEvent; }
 
-    public String getn_sale() { return n_sale; }
-    public void setn_sale(String n_sale) { this.n_sale = n_sale; }
+    public String getnSale() { return nSale; }
+    public void setnSale(String nSale) { this.nSale = nSale; }
+
+    public String getImage() { return image; }
+    public void setImage(String image) { this.image = image; }
 }

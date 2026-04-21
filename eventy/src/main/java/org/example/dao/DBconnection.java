@@ -10,6 +10,8 @@ public class DBconnection {
             + "?useSSL=false"
             + "&allowPublicKeyRetrieval=true"
             + "&serverTimezone=UTC"
+            + "&useJDBCCompliantTimezoneShift=true"
+            + "&useLegacyDatetimeCode=false"
             + "&useUnicode=true"
             + "&characterEncoding=UTF-8";
 
@@ -19,18 +21,17 @@ public class DBconnection {
     public static Connection getConnection() {
         Connection conn = null;
         try {
-            // Force load the MySQL driver
             Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("✅ MySQL Driver loaded successfully");
 
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("✅ Database connected successfully");
+            System.out.println("✅ Database connected successfully to 'eventy'");
 
         } catch (ClassNotFoundException e) {
             System.err.println("❌ MySQL Driver class not found!");
             e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("❌ Database connection failed!");
+            System.err.println("❌ Database connection failed! Check if MySQL is running and database 'eventy' exists.");
             e.printStackTrace();
         }
         return conn;

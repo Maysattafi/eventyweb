@@ -11,7 +11,20 @@
 
 <div class="form-container">
     <h2>Connexion</h2>
+    <%
+        String success = request.getParameter("success");
+        String error = (String) request.getAttribute("error");
 
+        if ("registered".equals(success)) { %>
+    <p style="color:green; text-align:center; margin-bottom:15px; font-weight:500;">
+        ✅ Inscription réussie ! Vous pouvez maintenant vous connecter.
+    </p>
+    <% }
+        if (error != null) { %>
+    <p style="color:red; text-align:center; margin-bottom:15px;">
+        <%= error %>
+    </p>
+    <% } %>
     <% if (request.getAttribute("error") != null) { %>
     <p style="color:red; text-align:center; margin-bottom:15px;">
         <%= request.getAttribute("error") %>

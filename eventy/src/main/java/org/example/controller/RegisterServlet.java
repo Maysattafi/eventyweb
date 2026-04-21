@@ -20,26 +20,22 @@ public class RegisterServlet extends HttpServlet {
         String email = request.getParameter("email");
         String password = request.getParameter("password");
 
-        System.out.println("=== REGISTRATION ATTEMPT ===");
-        System.out.println("Name: " + name);
-        System.out.println("Email: " + email);
+        if (name == null || name.trim().isEmpty() ||
+                email == null || email.trim().isEmpty() ||
+                password == null || password.trim().isEmpty()) {
 
-        Users newUser = new Users(name, email, password);
+            response.sendRedirect("signup.jsp?error=missing_fields");
+            return;
+        }
+
+        Users newUser = new Users(name.trim(), email.trim(), password.trim());
 
         boolean success = dao.register(newUser);
 
-        response.setContentType("text/html;charset=UTF-8");
-
         if (success) {
-            System.out.println("✅ Registration SUCCESS");
-            response.getWriter().println("<h2 style='color:green; text-align:center; margin-top:50px;'>✅ Compte créé avec succès !</h2>");
-            response.getWriter().println("<p style='text-align:center;'>Bienvenue <strong>" + name + "</strong></p>");
-            response.getWriter().println("<p style='text-align:center;'><a href='login.jsp' class='btn'>Se connecter maintenant</a></p>");
+            response.sendRedirect("login.jsp?success=registered");
         } else {
-            System.out.println("❌ Registration FAILED");
-            response.getWriter().println("<h2 style='color:red; text-align:center; margin-top:50px;'>❌ Échec de l'inscription</h2>");
-            response.getWriter().println("<p style='text-align:center;'>Vérifiez que l'email n'est pas déjà utilisé ou que la base de données est accessible.</p>");
-            response.getWriter().println("<p style='text-align:center;'><a href='signup.jsp' class='btn'>Réessayer</a></p>");
+            response.sendRedirect("signup.jsp?error=failed");
         }
     }
 }
