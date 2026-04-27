@@ -2,19 +2,14 @@
 <%@ page import="org.example.models.Users" %>
 <%@ page import="org.example.models.Event" %>
 <%@ page import="org.example.models.EventComment" %>
+<%@ page import="org.example.dao.EventDAO" %>
 <%@ page import="org.example.dao.EventCommentDAO" %>
 <%@ page import="java.util.List" %>
 
 <%
     Users user = (Users) session.getAttribute("loggedUser");
-    List<Event> endedEvents = (List<Event>) request.getAttribute("endedEvents");
-
-    if (user == null) {
-        response.sendRedirect("login.jsp");
-        return;
-    }
-
-    EventCommentDAO commentDAO = new EventCommentDAO();
+    EventDAO eventDAO = new EventDAO();
+    List<Event> endedEvents = eventDAO.getEndedEvents();
 %>
 
 <!DOCTYPE html>
@@ -22,120 +17,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Événements Terminés - Eventy</title>
+    <title>history - Eventy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; margin: 0; }
-        .header {
-            background: #1e40af;
-            color: white;
-            padding: 20px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .events-container {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 48px;
         }
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        h2 { text-align: center; color: #1e3a8a; margin-bottom: 40px; }
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 30px;
+        .page-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 38px;
+            font-weight: 700;
+            color: var(--white);
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
         }
-        .event-card {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-        .event-card h3 { color: #1e40af; margin-bottom: 12px; }
-        .event-card .date { color: #ef4444; font-weight: 600; margin-bottom: 15px; }
-        .past-badge {
-            background: #ef4444;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 14px;
-            display: inline-block;
-            margin-bottom: 15px;
+        .section-subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 17px;
+            margin-bottom: 60px;
         }
 
-        /* Compact Comment Area */
-        .quick-comment {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #e2e8f0;
+        /* Grid Layout for many events */
+        .ended-events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            gap: 28px;
         }
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            min-height: 70px;
-            font-size: 14px;
+
+        .ended-event-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
-        .btn-small {
-            background: #22c55e;
+        .ended-event-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--blue-light);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+        }
+
+        .ended-badge {
+            display: inline-block;
+            background: #ef4444;
             color: white;
-            padding: 10px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 18px;
+            border-radius: 50px;
+            margin-bottom: 16px;
+            align-self: flex-start;
+        }
+
+        .event-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--white);
+            line-height: 1.3;
+            margin-bottom: 12px;
+        }
+
+        .event-meta {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .description {
+            color: var(--text-main);
+            line-height: 1.7;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+
+        /* Compact Comments */
+        .comments-preview {
+            background: var(--navy-3);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            margin-top: auto;
+            border-left: 4px solid var(--blue-light);
+        }
+        .comment {
+            background: var(--card-bg);
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 10px;
+            font-size: 14.5px;
+            line-height: 1.5;
+            color: var(--text-muted);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .more-comments {
+            color: var(--blue-light);
             font-size: 14px;
-            margin-top: 8px;
+            cursor: pointer;
+        }
+
+        .action-btn {
+            margin-top: 20px;
+            display: inline-block;
+            width: 100%;
+            padding: 14px;
+            background: var(--blue);
+            color: white;
+            text-align: center;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .action-btn:hover {
+            background: var(--blue-light);
+            transform: translateY(-2px);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 120px 40px;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
 
-<div class="header">
-    <h2>Eventy</h2>
-    <a href="<%= "admin".equals(user.getRole()) ? "admin" : "etudiant.jsp" %>"
-       style="color:white;">Retour</a>
-</div>
+<!-- Navbar -->
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.jsp" class="logo">
+            <span class="logo-dot"></span>
+            Eventy
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.jsp" class="nav-link">Accueil</a></li>
+            <li><a href="evenementsTermines.jsp" class="nav-link active">history</a></li>
+            <li><a href="events.jsp" class="nav-link">Événements</a></li>
 
-<div class="container">
-    <h2>Événements Terminés</h2>
+        </ul>
+        <a href="<%= user != null ? "logout" : "login.jsp" %>" class="btn-nav">
+            <%= user != null ? "Déconnexion" : "Connexion" %>
+        </a>
+    </div>
+</nav>
 
-    <div class="events-grid">
-        <% if (endedEvents != null && !endedEvents.isEmpty()) {
-            for (Event e : endedEvents) {
-                List<EventComment> comments = commentDAO.getCommentsByEvent(e.getIdEvent().intValue());
+<div class="events-container">
+    <h1 class="page-title">Événements Terminés</h1>
+    <p class="section-subtitle">Découvrez les retours et commentaires des participants sur les événements passés</p>
+
+    <% if (endedEvents != null && !endedEvents.isEmpty()) { %>
+    <div class="ended-events-grid">
+        <% for (Event e : endedEvents) {
+            EventCommentDAO commentDAO = new EventCommentDAO();
+            List<EventComment> comments = commentDAO.getCommentsByEvent(e.getIdEvent().intValue());
         %>
-        <div class="event-card">
-            <span class="past-badge">Terminé</span>
-            <h3><%= e.getTitre() %></h3>
-            <p class="date">📅 <%= e.getDateEvent() %></p>
-            <p><strong>Lieu :</strong> <%= e.getnSale() %></p>
-            <p><%= e.getDescription() != null && e.getDescription().length() > 140
-                    ? e.getDescription().substring(0, 140) + "..."
-                    : e.getDescription() %></p>
+        <div class="ended-event-card">
+            <span class="ended-badge">TERMINÉ</span>
 
-            <!-- Quick Comment Box -->
-            <div class="quick-comment">
-                <% if (!"admin".equals(user.getRole())) { %>
-                <form action="AddCommentServlet" method="post">
-                    <input type="hidden" name="eventId" value="<%= e.getIdEvent() %>">
-                    <textarea name="comment" placeholder="Ajouter un commentaire rapide..." rows="2"></textarea>
-                    <button type="submit" class="btn-small">Publier commentaire</button>
-                </form>
+            <h2 class="event-title"><%= e.getTitre() %></h2>
+
+            <div class="event-meta">
+                📅 <%= e.getDateEvent() %><br>
+                📍 <%= e.getnSale() %>
+            </div>
+
+            <p class="description">
+                <%= e.getDescription() != null && e.getDescription().length() > 160
+                        ? e.getDescription().substring(0, 160) + "..."
+                        : (e.getDescription() != null ? e.getDescription() : "") %>
+            </p>
+
+            <!-- Compact Comments Preview -->
+            <div class="comments-preview">
+                <strong style="color: var(--blue-light);">💬 Commentaires des participants</strong>
+
+                <% if (comments != null && !comments.isEmpty()) {
+                    int displayCount = Math.min(2, comments.size());
+                    for (int i = 0; i < displayCount; i++) {
+                        EventComment c = comments.get(i);
+                %>
+                <div class="comment">
+                    <strong><%= c.getUsername() != null ? c.getUsername() : "Participant" %> :</strong>
+                    <%= c.getComment().length() > 110 ? c.getComment().substring(0, 110) + "..." : c.getComment() %>
+                </div>
+                <% } %>
+
+                <% if (comments.size() > 2) { %>
+                <span class="more-comments">+ <%= comments.size() - 2 %> autres commentaires</span>
+                <% } %>
+
+                <% } else { %>
+                <p style="color: var(--text-muted); font-style: italic; margin: 12px 0 0 0;">
+                    Aucun commentaire pour le moment.
+                </p>
                 <% } %>
             </div>
 
-            <!-- Link to Full Details with Expanded Comments -->
-            <div style="margin-top: 15px; text-align: center;">
-                <a href="EventServlet?id=<%= e.getIdEvent() %>&showComments=true"
-                   style="color:#3b82f6; text-decoration:none; font-weight:600;">
-                    Voir détails + tous les commentaires
-                </a>
-            </div>
+            <!-- Action Button -->
+            <% if (user != null) { %>
+            <a href="EventServlet?id=<%= e.getIdEvent() %>" class="action-btn">
+                Voir détails + laisser un commentaire
+            </a>
+            <% } else { %>
+            <a href="login.jsp" class="action-btn" style="background: var(--navy-3); color: var(--blue-light);">
+                Connectez-vous pour commenter
+            </a>
+            <% } %>
         </div>
-        <% }
-        } else { %>
-        <p style="text-align: center; color: #64748b; font-size: 18px;">
-            Aucun événement terminé pour le moment.
-        </p>
         <% } %>
     </div>
+    <% } else { %>
+    <div class="empty-state">
+        <h3>Aucun événement terminé pour le moment</h3>
+        <p>Les événements terminés et les retours des participants apparaîtront ici.</p>
+    </div>
+    <% } %>
 </div>
 
+<script src="js/script.js"></script>
 </body>
 </html>

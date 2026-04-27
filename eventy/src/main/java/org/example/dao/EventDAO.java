@@ -11,7 +11,7 @@ public class EventDAO {
 
     // Add new event
     public boolean addEvent(Event event) {
-        String sql = "INSERT INTO events (titre, description, date_event, n_sale, image) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO events (titre, description, date_event, n_sale, image,category) VALUES (?, ?, ?, ?, ?,?)";
 
         try (Connection con = DBconnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -21,6 +21,7 @@ public class EventDAO {
             ps.setString(3, event.getDateEvent());
             ps.setString(4, event.getnSale());
             ps.setString(5, event.getImage() != null ? event.getImage() : "");
+            ps.setString(6,event.getCategory());
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
@@ -35,7 +36,7 @@ public class EventDAO {
     // Get all events
     public List<Event> getAllEvents() {
         List<Event> events = new ArrayList<>();
-        String sql = "SELECT * FROM events ORDER BY date_event DESC";
+        String sql = "SELECT * FROM events";
 
         try (Connection con = DBconnection.getConnection();
              PreparedStatement ps = con.prepareStatement(sql);
@@ -49,6 +50,7 @@ public class EventDAO {
                 event.setDateEvent(rs.getString("date_event"));
                 event.setnSale(rs.getString("n_sale"));
                 event.setImage(rs.getString("image"));
+                event.setCategory(rs.getString("category"));
                 events.add(event);
             }
         } catch (SQLException e) {
@@ -76,6 +78,7 @@ public class EventDAO {
                     event.setDateEvent(rs.getString("date_event"));
                     event.setnSale(rs.getString("n_sale"));
                     event.setImage(rs.getString("image"));
+                    event.setCategory(rs.getString("category"));
                 }
             }
         } catch (SQLException e) {
@@ -102,6 +105,7 @@ public class EventDAO {
                     event.setDateEvent(rs.getString("date_event"));
                     event.setnSale(rs.getString("n_sale"));
                     event.setImage(rs.getString("image"));
+                    event.setCategory(rs.getString("category"));
                     events.add(event);
                 }
             }
@@ -159,6 +163,7 @@ public class EventDAO {
                 event.setDateEvent(rs.getString("date_event"));
                 event.setnSale(rs.getString("n_sale"));
                 event.setImage(rs.getString("image"));
+                event.setCategory(rs.getString("category"));
                 events.add(event);
             }
         } catch (SQLException e) {
@@ -166,4 +171,59 @@ public class EventDAO {
         }
         return events;
     }
+    public List<String> getAllCategories() {
+        List<String> categories = new ArrayList<>();
+        String sql = "SELECT DISTINCT category FROM events WHERE category IS NOT NULL AND category != '' ORDER BY category";
+
+        try (Connection con = DBconnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                categories.add(rs.getString("category"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return categories;
+    }
+    public boolean updateEvent(Event event) {
+        String sql = "UPDATE events SET titre=?, description=?, date_event=?, n_sale=?, image=? WHERE id_event=?";
+
+        try (Connection con = DBconnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, event.getTitre());
+            ps.setString(2, event.getDescription());
+            ps.setString(3, event.getDateEvent());
+            ps.setString(4, event.getnSale());
+            ps.setString(5, event.getImage() != null ? event.getImage() : "");
+            ps.setLong(6, event.getIdEvent());
+
+            int rows = ps.executeUpdate();
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    public boolean deleteEvent(Long eventId) {
+        String sql = "DELETE FROM events WHERE id_event = ?";
+
+        try (Connection con = DBconnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setLong(1, eventId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
+
+
 }

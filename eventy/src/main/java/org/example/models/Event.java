@@ -6,9 +6,19 @@ public class Event {
     private String description;
     private String dateEvent;
     private String nSale;
-    private String image;
+    private String image;      // ← Important: image path
+    private String category;
 
+    // Constructors
     public Event() {}
+
+    public Event(String titre, String description, String dateEvent, String nSale, String image) {
+        this.titre = titre;
+        this.description = description;
+        this.dateEvent = dateEvent;
+        this.nSale = nSale;
+        this.image = image;
+    }
 
     // Getters and Setters
     public Long getIdEvent() { return idEvent; }
@@ -28,4 +38,7 @@ public class Event {
 
     public String getImage() { return image; }
     public void setImage(String image) { this.image = image; }
+
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 }

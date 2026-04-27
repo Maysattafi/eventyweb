@@ -3,7 +3,10 @@
 <%@ page import="org.example.models.Event" %>
 <%@ page import="org.example.dao.EventDAO" %>
 <%@ page import="java.util.List" %>
-
+<%
+    EventDAO eventDAO = new EventDAO();
+    List<Event> event = eventDAO.getAllEvents();
+%>
 <%
     Users admin = (Users) session.getAttribute("loggedUser");
     if (admin == null || !"admin".equals(admin.getRole())) {
@@ -11,7 +14,6 @@
         return;
     }
 
-    EventDAO eventDAO = new EventDAO();
     List<Event> recentEvents = eventDAO.getRecentEvents(9);
 %>
 
@@ -20,84 +22,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espace Administrateur - Eventy</title>
+    <title>Eventy – Découvrez l'Institut</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .navbar {
-            background: #1e40af;
-            padding: 18px 40px;
-            color: white;
-            display: flex;
-            align-items: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .navbar .logo { font-size: 24px; font-weight: 700; margin-right: 60px; }
-        .navbar a {
-            color: white;
-            text-decoration: none;
-            margin-right: 35px;
-            font-weight: 600;
-            font-size: 17px;
-        }
-        .navbar a:hover { color: #93c5fd; }
-        .logout {
-            margin-left: auto;
-            background: #ef4444;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 25px;
-        }
-        .event-card {
-            background: white;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-        .event-card:hover { transform: translateY(-8px); }
-    </style>
 </head>
 <body>
 
-<div class="navbar">
-    <div class="logo">Eventy</div>
-    <a href="admin">Accueil</a>
-    <a href="admin?action=users">Utilisateurs</a>
-    <a href="admin?action=events">Événements</a>
-    <a href="ajouterEvenement.jsp">Ajouter un Événement</a>
-    <a href="EventServlet?action=ended">Événements Terminés</a>
-    <a href="logout" class="logout">Déconnexion</a>
-</div>
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="admin" class="logo">
+            <span class="logo-dot"></span>
+            Eventy
+        </a>
+        <ul class="nav-links">
+            <li><a href="admin" class="nav-link active">Accueil</a></li>
+            <li><a href="admin?action=users" class="nav-link ">Utilisateurs</a></li>
+            <li><a href="admin?action=events" class="nav-link">Événements</a></li>
+            <li><a href="ajouterEvenement.jsp" class="nav-link">Ajouter un Événement </a></li>
+            <li><a href="evenementsTermines.jsp" class="nav-link ">historique</a></li>
+        </ul>
+        <a href="logout" class="btn-nav">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Déconnexion
+        </a>
+    </div>
+</nav>
 
-<div class="container" style="max-width:1300px; margin:50px auto; padding:0 20px;">
-    <h2 style="text-align:center; color:#1e3a8a;">Événements Populaires</h2>
+<section class="list-section">
+    <div class="section-header">
+        <div class="section-label">Agenda complet</div>
+        <h2 class="section-title">Tous les événements</h2>
+    </div>
 
-    <div class="events-grid">
-        <% if (recentEvents != null && !recentEvents.isEmpty()) {
-            for (Event e : recentEvents) { %>
-        <div class="event-card">
-            <h3><%= e.getTitre() %></h3>
-            <p class="date" style="color:#3b82f6; font-weight:600;"><%= e.getDateEvent() %></p>
-            <p><strong>Lieu :</strong> <%= e.getnSale() %></p>
-            <p><%= e.getDescription() != null && e.getDescription().length() > 110
-                    ? e.getDescription().substring(0, 110) + "..."
-                    : e.getDescription() %></p>
-        </div>
-        <% }
+    <div class="events-carousel" id="carouselTrack">
+        <% if (event != null && !event.isEmpty()) {
+            int cardIndex = 1;
+            for (Event e : event) {
+                String cardClass = (cardIndex % 4 == 1) ? "card-blue" :
+                        (cardIndex % 4 == 2) ? "card-coral" :
+                                (cardIndex % 4 == 3) ? "card-teal" : "card-purple";
+                cardIndex++;
+        %>
+        <article class="event-card <%= cardClass %>">
+            <div class="card-top">
+                <div class="card-category">
+                    <%= e.getCategory() != null && !e.getCategory().trim().isEmpty()
+                            ? e.getCategory()
+                            : "Événement" %>
+                </div>
+                <div class="card-bookmark">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                </div>
+            </div>
+            <div class="card-icon-wrap">📅</div>
+            <h3 class="card-title"><%= e.getTitre() %></h3>
+            <p class="card-desc">
+                <%= e.getDescription() != null && e.getDescription().length() > 110
+                        ? e.getDescription().substring(0, 110) + "..."
+                        : e.getDescription() %>
+            </p>
+            <div class="card-meta">
+                        <span class="card-date">
+                            <%= e.getDateEvent() %>
+                        </span>
+            </div>
+            <a href="EventServlet?id=<%= e.getIdEvent() %>" class="card-btn">Voir détails</a>
+        </article>
+        <%
+            }
         } else { %>
-        <p style="text-align:center; grid-column:1/-1; color:#64748b; font-size:18px;">
-            Aucun événement disponible pour le moment.
+        <p style="grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: #8892a4; font-size: 18px;">
+            Aucun événement à venir pour le moment.
         </p>
         <% } %>
     </div>
-</div>
-
+</section>
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+                <span class="logo">
+                    <span class="logo-dot"></span>Eventy
+                </span>
+            <p>La plateforme officielle des événements de l'Institut.</p>
+        </div>
+        <div class="footer-links">
+            <a href="index.jsp">Accueil</a>
+            <a href="events.jsp">Événements</a>
+            <a href="login.jsp">Connexion</a>
+        </div>
+        <p class="footer-copy">© 2026 Eventy. Tous droits réservés.</p>
+    </div>
+</footer>
+<script src="js/script.js"></script>
 </body>
 </html>

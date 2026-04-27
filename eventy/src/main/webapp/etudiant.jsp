@@ -3,7 +3,10 @@
 <%@ page import="org.example.models.Event" %>
 <%@ page import="org.example.dao.EventDAO" %>
 <%@ page import="java.util.List" %>
-
+<%
+    EventDAO eventDAO = new EventDAO();
+    List<Event> event = eventDAO.getAllEvents();
+%>
 <%
     Users user = (Users) session.getAttribute("loggedUser");
     if (user == null) {
@@ -11,7 +14,6 @@
         return;
     }
 
-    EventDAO eventDAO = new EventDAO();
     List<Event> upcomingEvents = eventDAO.getRecentEvents(9);
 %>
 
@@ -20,174 +22,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Espace Étudiant - Eventy</title>
+    <title>Eventy – Découvrez l'Institut</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
-    <style>
-        .student-header {
-            background: linear-gradient(135deg, #2563eb, #1e40af);
-            color: white;
-            padding: 25px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-        }
-        .welcome {
-            font-size: 26px;
-            font-weight: 700;
-        }
-        .header-buttons {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        .btn-rounded {
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .btn-ended {
-            background: rgba(255,255,255,0.25);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.4);
-        }
-        .btn-ended:hover {
-            background: rgba(255,255,255,0.35);
-        }
-        .btn-logout {
-            background: #ef4444;
-            color: white;
-        }
-        .btn-logout:hover {
-            background: #dc2626;
-        }
-
-        .action-bar {
-            background: #f8fafc;
-            padding: 25px 40px;
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        .action-btn {
-            background: white;
-            color: #1e40af;
-            padding: 14px 32px;
-            border-radius: 50px;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.25);
-        }
-
-        .events-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 28px;
-            padding: 40px;
-        }
-        .event-card {
-            background: white;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s;
-        }
-        .event-card:hover {
-            transform: translateY(-10px);
-        }
-        .event-card h3 {
-            padding: 20px 20px 8px;
-            margin: 0;
-            color: #1e3a8a;
-        }
-        .event-date {
-            padding: 0 20px;
-            color: #3b82f6;
-            font-weight: 600;
-        }
-        .event-card p {
-            padding: 12px 20px 25px;
-            margin: 0;
-            color: #64748b;
-        }
-        .btn-view {
-            display: block;
-            width: 85%;
-            margin: 0 auto 25px;
-            padding: 14px;
-            background: linear-gradient(135deg, #3b82f6, #60a5fa);
-            color: white;
-            text-align: center;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .btn-view:hover {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-        }
-    </style>
 </head>
 <body>
-
-<!-- Blue Header -->
-<div class="student-header">
-    <div class="welcome">👋 Bienvenue, <%= user.getName() %> !</div>
-
-    <div class="header-buttons">
-        <a href="logout" class="btn-rounded btn-logout">
-            Déconnexion
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.jsp" class="logo">
+            <span class="logo-dot"></span>
+            Eventy
         </a>
-    </div>
-</div>
-
-<!-- Action Buttons Bar -->
-<div class="action-bar">
-    <a href="#upcoming" class="action-btn">
-        📆 Événements à venir
-    </a>
-    <a href="EventServlet?action=ended" class="action-btn">
-        📅 Événements Terminés
-    </a>
-</div>
-
-<div class="container" style="max-width: 1300px; margin: 0 auto;">
-    <h2 style="text-align: center; color: #1e3a8a; margin: 40px 0 30px;">Événements Populaires</h2>
-
-    <div class="events-grid">
-        <% if (upcomingEvents != null && !upcomingEvents.isEmpty()) {
-            for (Event e : upcomingEvents) { %>
-        <div class="event-card">
-            <h3><%= e.getTitre() %></h3>
-            <p class="event-date">📅 <%= e.getDateEvent() %></p>
-            <p><strong>Lieu :</strong> <%= e.getnSale() %></p>
-            <p><%= e.getDescription() != null && e.getDescription().length() > 120
-                    ? e.getDescription().substring(0, 120) + "..."
-                    : (e.getDescription() != null ? e.getDescription() : "") %></p>
-            <a href="EventServlet?id=<%= e.getIdEvent() %>" class="btn-view">Voir détails & S'inscrire</a>
+        <ul class="nav-links">
+            <li><a href="index.jsp" class="nav-link active">Accueil</a></li>
+            <li><a href="evenementsTermines.jsp" class="nav-link ">historique</a></li>
+            <li><a href="events.jsp" class="nav-link">Événements</a></li>
+        </ul>
+        <div class="header-buttons">
+            <a href="logout" class="btn-nav">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Déconnexion
+            </a>
         </div>
-        <% }
+    </div>
+</nav>
+
+<!-- ALL EVENTS LIST - DYNAMIC -->
+<section class="list-section">
+    <div class="section-header">
+        <div class="section-label">Agenda complet</div>
+        <h2 class="section-title">Tous les événements</h2>
+    </div>
+
+    <div class="events-carousel" id="carouselTrack">
+        <% if (event != null && !event.isEmpty()) {
+            int cardIndex = 1;
+            for (Event e : event) {
+                String cardClass = (cardIndex % 4 == 1) ? "card-blue" :
+                        (cardIndex % 4 == 2) ? "card-coral" :
+                                (cardIndex % 4 == 3) ? "card-teal" : "card-purple";
+                cardIndex++;
+        %>
+        <article class="event-card <%= cardClass %>">
+            <div class="card-top">
+                <div class="card-category">
+                    <%= e.getCategory() != null && !e.getCategory().trim().isEmpty()
+                            ? e.getCategory()
+                            : "Événement" %>
+                </div>
+                <div class="card-bookmark">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>
+                </div>
+            </div>
+            <div class="card-icon-wrap">📅</div>
+            <h3 class="card-title"><%= e.getTitre() %></h3>
+            <p class="card-desc">
+                <%= e.getDescription() != null && e.getDescription().length() > 110
+                        ? e.getDescription().substring(0, 110) + "..."
+                        : e.getDescription() %>
+            </p>
+            <div class="card-meta">
+                        <span class="card-date">
+                            <%= e.getDateEvent() %>
+                        </span>
+            </div>
+            <a href="EventServlet?id=<%= e.getIdEvent() %>" class="card-btn">Voir détails</a>
+        </article>
+        <%
+            }
         } else { %>
-        <p style="grid-column: 1 / -1; text-align: center; color: #64748b; font-size: 18px; padding: 80px 20px;">
-            Aucun événement disponible pour le moment.
+        <p style="grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: #8892a4; font-size: 18px;">
+            Aucun événement à venir pour le moment.
         </p>
         <% } %>
     </div>
-</div>
+</section>
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+                <span class="logo">
+                    <span class="logo-dot"></span>Eventy
+                </span>
+            <p>La plateforme officielle des événements de l'Institut.</p>
+        </div>
+        <div class="footer-links">
+            <a href="index.jsp">Accueil</a>
+            <a href="events.jsp">Événements</a>
+            <a href="login.jsp">Connexion</a>
+        </div>
+        <p class="footer-copy">© 2026 Eventy. Tous droits réservés.</p>
+    </div>
+</footer>
 
 <script src="js/script.js"></script>
 </body>

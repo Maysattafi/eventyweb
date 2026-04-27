@@ -1,51 +1,104 @@
 <%@page language="java" contentType="text/html" pageEncoding="UTF-8" %>
 <%@page import="org.example.models.Event"%>
+<%@ page import="org.example.dao.EventDAO" %>
 <%@page import="java.util.List"%>
+
+<%
+    EventDAO eventDAO = new EventDAO();
+    List<Event> eventsList = eventDAO.getRecentEvents(50);
+%>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Événements - Eventy</title>
+    <title>Eventy – Découvrez l'Institut</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<nav>
-    <div class="logo">Eventy</div>
-    <ul>
-        <li><a href="index.jsp">Accueil</a></li>
-        <li><a href="events">Événements</a></li>
-    </ul>
-    <a href="login.jsp" class="btn">Connexion</a>
+<nav class="navbar" id="navbar">
+    <div class="nav-inner">
+        <a href="index.jsp" class="logo">
+            <span class="logo-dot"></span> Eventy
+        </a>
+        <ul class="nav-links">
+            <li><a href="index.jsp" class="nav-link">Accueil</a></li>
+            <li><a href="evenementsTermines.jsp" class="nav-link">historique</a></li>
+            <li><a href="events.jsp" class="nav-link active">Événements</a></li>
+        </ul>
+        <a href="login.jsp" class="btn-nav">Connexion</a>
+    </div>
 </nav>
 
-<section class="events">
-    <h2>Tous les événements</h2>
+<section class="list-section">
+    <div class="section-header">
+        <div class="section-label">Agenda complet</div>
+        <h2 class="section-title">Tous les événements</h2>
+    </div>
 
-    <div class="event-container">
-        <%
-            List<Event> events = (List<Event>) request.getAttribute("events");
-            if (events != null && !events.isEmpty()) {
-                for (Event e : events) {
+    <div class="events-carousel" id="carouselTrack">
+        <% if (eventsList != null && !eventsList.isEmpty()) {
+            int cardIndex = 1;
+            for (Event e : eventsList) {
+                String cardClass = (cardIndex % 4 == 1) ? "card-blue" :
+                        (cardIndex % 4 == 2) ? "card-coral" :
+                                (cardIndex % 4 == 3) ? "card-teal" : "card-purple";
+                cardIndex++;
         %>
-        <div class="event-card">
-            <h3><%= e.getTitre() %></h3>
-            <p><%= e.getDate() %></p>
-            <a href="events?id=<%= e.getId() %>" class="btn">Voir détails</a>
-        </div>
-        <%
-            }
-        } else {
-        %>
-        <p style="grid-column: 1 / -1; text-align:center; padding:40px;">
-            Aucun événement disponible pour le moment.
+        <article class="event-card <%= cardClass %>">
+            <div class="card-top">
+                <div class="card-category">
+                    <%= e.getCategory() != null && !e.getCategory().trim().isEmpty()
+                            ? e.getCategory() : "Événement" %>
+                </div>
+                <div class="card-bookmark">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>
+                    </svg>
+                </div>
+            </div>
+            <div class="card-icon-wrap">📅</div>
+            <h3 class="card-title"><%= e.getTitre() %></h3>
+            <p class="card-desc">
+                <%= e.getDescription() != null && e.getDescription().length() > 110
+                        ? e.getDescription().substring(0, 110) + "..."
+                        : (e.getDescription() != null ? e.getDescription() : "") %>
+            </p>
+            <div class="card-meta">
+                <span class="card-date">
+                    <%= e.getDateEvent() != null ? e.getDateEvent() : "Date non définie" %>
+                </span>
+            </div>
+            <a href="EventServlet?id=<%= e.getIdEvent() %>" class="card-btn">Voir détails</a>
+        </article>
+        <% }
+        } else { %>
+        <p style="grid-column: 1 / -1; text-align: center; padding: 80px 20px; color: #8892a4; font-size: 18px;">
+            Aucun événement à venir pour le moment.
         </p>
-        <%
-            }
-        %>
+        <% } %>
     </div>
 </section>
+
+<footer class="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <span class="logo"><span class="logo-dot"></span>Eventy</span>
+            <p>La plateforme officielle des événements de l'Institut.</p>
+        </div>
+        <div class="footer-links">
+            <a href="index.jsp">Accueil</a>
+            <a href="events.jsp">Événements</a>
+            <a href="login.jsp">Connexion</a>
+        </div>
+        <p class="footer-copy">© 2026 Eventy. Tous droits réservés.</p>
+    </div>
+</footer>
 
 <script src="js/script.js"></script>
 </body>

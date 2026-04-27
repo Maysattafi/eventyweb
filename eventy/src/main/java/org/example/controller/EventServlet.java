@@ -75,6 +75,7 @@ public class EventServlet extends HttpServlet {
             return;
         }
 
+
         // Default fallback
         response.sendRedirect("index.jsp");
     }

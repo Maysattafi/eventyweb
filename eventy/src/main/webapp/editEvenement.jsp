@@ -1,11 +1,36 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="org.example.models.Users" %>
+<%@ page import="org.example.models.Event" %>
+<%@ page import="java.time.*" %>
+<%@ page import="java.time.format.*" %>
 
 <%
     Users admin = (Users) session.getAttribute("loggedUser");
     if (admin == null || !"admin".equals(admin.getRole())) {
         response.sendRedirect("login.jsp");
         return;
+    }
+
+    Event event = (Event) request.getAttribute("event");
+    if (event == null) {
+        response.sendRedirect("admin?action=events");
+        return;
+    }
+
+    // Format date for datetime-local input (yyyy-MM-dd'T'HH:mm)
+    String formattedDate = "";
+    try {
+        if (event.getDateEvent() != null) {
+            String raw = event.getDateEvent();
+            // Handle both "2026-04-25" and "2026-04-25 14:30:00"
+            if (raw.length() >= 16) {
+                formattedDate = raw.substring(0, 16);           // "2026-04-25 14:30"
+            } else if (raw.length() >= 10) {
+                formattedDate = raw.substring(0, 10) + "T00:00"; // "2026-04-25T00:00"
+            }
+        }
+    } catch (Exception e) {
+        formattedDate = "";
     }
 %>
 
@@ -14,52 +39,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter un Événement - Eventy</title>
+    <title>Modifier Événement - Eventy</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
         .form-card {
-            max-width: 820px;
+            max-width: 800px;
             margin: 80px auto;
             background: var(--card-bg);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-lg);
-            padding: 50px 45px;
-        }
-        .form-card h2 {
-            text-align: center;
-            color: var(--white);
-            margin-bottom: 45px;
-            font-size: 32px;
+            padding: 50px;
         }
         label {
             display: block;
             color: var(--blue-light);
             font-weight: 600;
             margin-bottom: 8px;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        input[type="text"], input[type="datetime-local"], textarea {
+        input, textarea {
             width: 100%;
-            padding: 16px 20px;
+            padding: 16px;
             background: var(--navy-3);
             border: 1px solid var(--card-border);
             border-radius: var(--radius-md);
             color: var(--text-main);
-            font-size: 15px;
-            margin-bottom: 24px;
-        }
-        input[type="file"] {
-            width: 100%;
-            padding: 12px;
-            background: var(--navy-3);
-            border: 1px solid var(--card-border);
-            border-radius: var(--radius-md);
-            color: var(--text-main);
+            margin-bottom: 20px;
         }
         button {
             width: 100%;
@@ -68,14 +75,8 @@
             color: white;
             border: none;
             border-radius: 50px;
-            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-        }
-        button:hover {
-            background: var(--blue-light);
-            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -83,41 +84,38 @@
 
 <nav class="navbar" id="navbar">
     <div class="nav-inner">
-        <a href="admin" class="logo">
-            <span class="logo-dot"></span> Eventy
-        </a>
+        <a href="admin" class="logo"><span class="logo-dot"></span> Eventy</a>
         <ul class="nav-links">
             <li><a href="admin" class="nav-link">Accueil</a></li>
             <li><a href="admin?action=users" class="nav-link">Utilisateurs</a></li>
             <li><a href="admin?action=events" class="nav-link">Événements</a></li>
-            <li><a href="ajouterEvenement.jsp" class="nav-link active">Ajouter un Événement</a></li>
         </ul>
         <a href="logout" class="btn-nav">Déconnexion</a>
     </div>
 </nav>
 
 <div class="form-card">
-    <h2>Ajouter un Nouvel Événement</h2>
+    <h2 style="color:var(--white); text-align:center; margin-bottom:40px;">Modifier l'Événement</h2>
 
-    <form action="AddEventServlet" method="post" enctype="multipart/form-data">
+    <form action="UpdateEventServlet" method="post">
+        <input type="hidden" name="id" value="<%= event.getIdEvent() %>">
+
         <label>Titre de l'événement</label>
-        <input type="text" name="titre" required>
+        <input type="text" name="titre" value="<%= event.getTitre() %>" required>
 
         <label>Description</label>
-        <textarea name="description" rows="6" required></textarea>
+        <textarea name="description" rows="6" required><%= event.getDescription() != null ? event.getDescription() : "" %></textarea>
 
         <label>Date de l'événement</label>
-        <input type="datetime-local" name="date_event" required>
+        <input type="datetime-local" name="date_event" value="<%= formattedDate %>" required>
 
         <label>Salle / Lieu</label>
-        <input type="text" name="n_sale" required>
-        <label>categorie</label>
-        <input type="text" name="categorie" required>
+        <input type="text" name="n_sale" value="<%= event.getnSale() %>" required>
 
-        <label>Image de l'événement <span style="color:#ef4444;">(obligatoire)</span></label>
-        <input type="file" name="image" accept="image/*" required>
+        <label>Image (laisser vide pour garder l'ancienne)</label>
+        <input type="text" name="image" value="<%= event.getImage() != null ? event.getImage() : "" %>">
 
-        <button type="submit">Ajouter l'Événement</button>
+        <button type="submit">Enregistrer les modifications</button>
     </form>
 </div>
 
