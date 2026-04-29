@@ -224,6 +224,52 @@ public class EventDAO {
         }
 
     }
+    // Search events by title, description or category
+    // Search by name (titre) + category support
+    public List<Event> searchEvents(String query, String category) {
+        List<Event> events = new ArrayList<>();
 
+        String sql = """
+        SELECT * FROM events 
+        WHERE (titre LIKE ? OR description LIKE ?)
+    """;
+
+        // Add category filter if provided and not "all"
+        if (category != null && !category.trim().isEmpty() && !"all".equalsIgnoreCase(category)) {
+            sql += " AND category = ?";
+        }
+
+        sql += " ORDER BY date_event ASC";
+
+        try (Connection con = DBconnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            String searchPattern = "%" + (query != null ? query.trim() : "") + "%";
+
+            ps.setString(1, searchPattern);   // titre
+            ps.setString(2, searchPattern);   // description
+
+            if (category != null && !category.trim().isEmpty() && !"all".equalsIgnoreCase(category)) {
+                ps.setString(3, category.trim());
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Event event = new Event();
+                    event.setIdEvent(rs.getLong("id_event"));
+                    event.setTitre(rs.getString("titre"));
+                    event.setDescription(rs.getString("description"));
+                    event.setDateEvent(rs.getString("date_event"));
+                    event.setnSale(rs.getString("n_sale"));
+                    event.setImage(rs.getString("image"));
+                    event.setCategory(rs.getString("category"));
+                    events.add(event);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return events;
+    }
 
 }

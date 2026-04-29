@@ -9,32 +9,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5ae59332-501e-4c99-ba0f-b61811f71ee2" name="Changes" comment="third commit">
-      <change afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/DeleteEventServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/EditEventServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/UpdateEventServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/eventy/src/main/webapp/editEvenement.jsp" afterDir="false" />
+    <list default="true" id="5ae59332-501e-4c99-ba0f-b61811f71ee2" name="Changes" comment="4th commit">
+      <change afterPath="$PROJECT_DIR$/eventy/src/main/webapp/searchResults.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/webContexts.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/webContexts.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/AddEventServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/AddEventServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/EventServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/EventServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/LogoutServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/controller/LogoutServlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/eventy/src/main/java/org/example/dao/EventDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/dao/EventDAO.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/java/org/example/models/Event.java" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/java/org/example/models/Event.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/admin.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/admin.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/ajouterEvenement.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/ajouterEvenement.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/css/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/etudiant.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/etudiant.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/evenementsTermines.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/evenementsTermines.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/eventDetails.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/eventDetails.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/events.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/events.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/index.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/index.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/inscritsEvenement.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/inscritsEvenement.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/js/script.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/listeEvenements.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/listeEvenements.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/listeUtilisateurs.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/listeUtilisateurs.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/login.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/eventy/src/main/webapp/signup.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/eventy/src/main/webapp/signup.jsp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,8 +27,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="Jsp File" />
         <option value="Class" />
+        <option value="Jsp File" />
       </list>
     </option>
   </component>
@@ -293,7 +276,9 @@
       <workItem from="1775753488623" duration="3195000" />
       <workItem from="1776000905694" duration="12919000" />
       <workItem from="1776331767136" duration="71314000" />
-      <workItem from="1777298885336" duration="603000" />
+      <workItem from="1777298885336" duration="10178000" />
+      <workItem from="1777383536359" duration="860000" />
+      <workItem from="1777401117895" duration="3539000" />
     </task>
     <task id="LOCAL-00001" summary="third commit">
       <option name="closed" value="true" />
@@ -303,7 +288,15 @@
       <option name="project" value="LOCAL" />
       <updated>1776787828181</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="4th commit">
+      <option name="closed" value="true" />
+      <created>1777299539402</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1777299539402</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -322,6 +315,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="third commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="third commit" />
+    <MESSAGE value="4th commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="4th commit" />
   </component>
 </project>

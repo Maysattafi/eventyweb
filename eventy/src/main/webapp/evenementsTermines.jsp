@@ -230,7 +230,7 @@
             <!-- Action Button -->
             <% if (user != null) { %>
             <a href="EventServlet?id=<%= e.getIdEvent() %>" class="action-btn">
-                Voir détails + laisser un commentaire
+                laisser un commentaire
             </a>
             <% } else { %>
             <a href="login.jsp" class="action-btn" style="background: var(--navy-3); color: var(--blue-light);">

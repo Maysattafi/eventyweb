@@ -21,6 +21,23 @@ public class EventServlet extends HttpServlet {
         String action = request.getParameter("action");
         String idParam = request.getParameter("id");
         String eventIdParam = request.getParameter("eventId");
+        String query = request.getParameter("query");
+        String category = request.getParameter("category");
+
+        // ====================== SEARCH BY NAME + CATEGORY ======================
+        if ("search".equals(action) ||
+                (query != null && !query.trim().isEmpty()) ||
+                (category != null && !"all".equalsIgnoreCase(category))) {
+
+            List<Event> searchResults = eventDAO.searchEvents(query, category);
+
+            request.setAttribute("searchResults", searchResults);
+            request.setAttribute("searchQuery", query != null ? query.trim() : "");
+            request.setAttribute("selectedCategory", category);
+
+            request.getRequestDispatcher("searchResults.jsp").forward(request, response);
+            return;
+        }
 
         // 1. Show list of all events (for admin)
         if ("list".equals(action) || (action == null && idParam == null && eventIdParam == null)) {
@@ -30,7 +47,7 @@ public class EventServlet extends HttpServlet {
             return;
         }
 
-        // 2. Show single event details (when clicking "Voir plus")
+        // 2. Show single event details
         if (idParam != null && !idParam.trim().isEmpty()) {
             try {
                 Long eventId = Long.parseLong(idParam);
@@ -49,17 +66,19 @@ public class EventServlet extends HttpServlet {
             return;
         }
 
-        // 3. Show students registered in an event (for admin)
+        // 3. Show students registered in an event (for admin) - FIXED
         if ("registered".equals(action) && eventIdParam != null) {
             try {
                 Long eventId = Long.parseLong(eventIdParam);
+
                 Event event = eventDAO.getEventById(eventId);
                 List<RegistrationInfo> registeredStudents = eventDAO.getRegisteredStudents(eventId);
 
                 request.setAttribute("event", event);
                 request.setAttribute("registeredStudents", registeredStudents);
+
                 request.getRequestDispatcher("inscritsEvenement.jsp").forward(request, response);
-                return;
+
             } catch (Exception e) {
                 e.printStackTrace();
                 response.sendRedirect("admin?action=events");
@@ -67,14 +86,13 @@ public class EventServlet extends HttpServlet {
             return;
         }
 
-        // 4. NEW: Show all ended (past) events
+        // 4. Show ended (past) events
         if ("ended".equals(action)) {
             List<Event> endedEvents = eventDAO.getEndedEvents();
             request.setAttribute("endedEvents", endedEvents);
             request.getRequestDispatcher("evenementsTermines.jsp").forward(request, response);
             return;
         }
-
 
         // Default fallback
         response.sendRedirect("index.jsp");

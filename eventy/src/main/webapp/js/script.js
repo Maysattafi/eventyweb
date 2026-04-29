@@ -27,6 +27,12 @@ document.querySelectorAll('.search-tags .tag').forEach(tag => {
         tag.classList.add('active');
     });
 });
+function filterByCategory(category) {
+    document.getElementById('categoryInput').value = category;
+    // If "Tous" is clicked, clear query too or keep it
+    const form = document.getElementById('searchForm');
+    form.submit();
+}
 
 /* ── CARD BOOKMARK TOGGLE ── */
 document.querySelectorAll('.card-bookmark').forEach(btn => {
@@ -74,17 +80,3 @@ document.querySelectorAll('.event-card, .list-item').forEach((el, i) => {
     observer.observe(el);
 });
 
-    function filterByCategory(category) {
-    document.getElementById('categoryInput').value = category;
-
-    // Highlight active tag
-    document.querySelectorAll('.search-tags .tag').forEach(tag => {
-    tag.classList.remove('active');
-    if ((category === 'all' && tag.textContent.trim() === 'Tous') ||
-    tag.textContent.trim() === category) {
-    tag.classList.add('active');
-}
-});
-
-    document.getElementById('searchForm').submit();
-}
